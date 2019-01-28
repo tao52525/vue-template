@@ -6,5 +6,6 @@ module.exports = {
         useBuiltIns: "usage"
       }
     ]
-  ]
+  ],
+  plugins: ["@babel/plugin-syntax-dynamic-import"]
 };

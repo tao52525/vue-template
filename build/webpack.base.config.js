@@ -1,17 +1,17 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
-const AutoDllPlugin = require('autodll-webpack-plugin')
 const webpack = require('webpack')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-console.log(process.env.NODE_ENV)
+const PreloadWebpackPlugin = require('preload-webpack-plugin')
+
 module.exports = {
   entry: {
-    app: path.resolve(__dirname, '../src/index.js')
+    index: path.resolve(__dirname, '../src/index.js')
   },
   output: {
     path: path.resolve(__dirname, '../dist'),
-    filename: 'js/[name].[hash].js'
+    filename: '[name].js'
   },
   resolve: {
     alias: {
@@ -27,10 +27,23 @@ module.exports = {
         use: 'babel-loader',
         exclude: /node_modules/
       },
+      /* config.module.rule('images') */
       {
-        test: /\.(png|svg|jpg|gif)$/,
+        test: /\.(png|jpe?g|gif|webp)(\?.*)?$/,
         use: [
-          'file-loader'
+          /* config.module.rule('images').use('url-loader') */
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 4096,
+              fallback: {
+                loader: 'file-loader',
+                options: {
+                  name: 'img/[name].[hash:8].[ext]'
+                }
+              }
+            }
+          }
         ]
       },
       {
@@ -61,28 +74,54 @@ module.exports = {
             : MiniCssExtractPlugin.loader,
           'css-loader', 'stylus-loader', 'postcss-loader'
         ]
+      },
+      {
+        test: /\.less$/,
+        use: [
+          process.env.NODE_ENV !== 'production'
+            ? 'vue-style-loader'
+            : MiniCssExtractPlugin.loader,
+          'css-loader', 'less-loader', 'postcss-loader'
+        ]
       }
     ]
   },
   plugins: [
     new VueLoaderPlugin (),
     new HtmlWebpackPlugin({
+      filename: 'index.html',
       template: path.resolve(__dirname, '../public/index.html'),
+      favicon: path.resolve(__dirname, '../public/favicon.ico'),
       chunks: [
         'chunk-vendors',
-        'chunk-common',
+        'chunk-commons',
         'index'
-      ],
+      ]
     }),
-    new AutoDllPlugin({
-      inject: true,
-      debug: true,
-      filename: '[name]_[hash].js',
-      path: './js',
-      entry: {
-        vendor: ['vue']
+    /* config.plugin('preload-index') */
+    new PreloadWebpackPlugin(
+      {
+        rel: 'preload',
+        includeHtmlNames: [
+          'index.html'
+        ],
+        include: 'initial',
+        fileBlacklist: [
+          /\.map$/,
+          /hot-update\.js$/
+        ]
       }
-    }),
+    ),
+    /* config.plugin('prefetch-index') */
+    new PreloadWebpackPlugin(
+      {
+        rel: 'prefetch',
+        includeHtmlNames: [
+          'index.html'
+        ],
+        include: 'asyncChunks'
+      }
+    ),
     new webpack.optimize.SplitChunksPlugin()
   ]
 }

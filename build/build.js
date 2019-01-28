@@ -2,11 +2,9 @@ const webpack = require('webpack')
 const config = require('./webpack.prod.config')
 
 webpack(config, (err, stats) => {
-  if (err || stats.hasErrors()) {
-    console.error(err)
-    return
-  }
-  console.log(stats.toString({
+  if (err) throw err
+  process.stdout.write(
+    stats.toString({
       colors: true,
       modules: false,
       children: false,
@@ -14,4 +12,9 @@ webpack(config, (err, stats) => {
       chunkModules: false
     }) + '\n\n'
   )
+
+  if (stats.hasErrors()) {
+    console.log(chalk.red(' Build failed with errors.\n'))
+    process.exit(1)
+  }
 })
