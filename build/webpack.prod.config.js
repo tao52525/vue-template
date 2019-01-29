@@ -6,6 +6,9 @@ const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const TerserWebpackPlugin = require('terser-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const PreloadWebpackPlugin = require('preload-webpack-plugin')
+const webpack = require('webpack')
+const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 module.exports = merge(baseConfig, {
   mode: 'production',
@@ -19,11 +22,26 @@ module.exports = merge(baseConfig, {
     rules: []
   },
   plugins: [
+    /* config.plugin('define') */
+    new webpack.DefinePlugin(
+      {
+        'process.env': {
+          NODE_ENV: '"production"'
+        }
+      }
+    ),
     new HtmlWebpackPlugin({
       filename: path.resolve(__dirname, '../dist/index.html'),
       template: path.resolve(__dirname, '../public/index.html'),
       favicon: path.resolve(__dirname, '../public/favicon.ico'),
-      inject: true
+      inject: true,
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeAttributeQuotes: true
+        // more options:
+        // https://github.com/kangax/html-minifier#options-quick-reference
+      }
     }),
     /* config.plugin('preload-index') */
     new PreloadWebpackPlugin(
@@ -49,10 +67,23 @@ module.exports = merge(baseConfig, {
         include: 'asyncChunks'
       }
     ),
+    /* 将runtime代码放到index.html中,减少请求 */
+    new ScriptExtHtmlWebpackPlugin({
+      //`runtime` must same as runtimeChunk name. default is `runtime`
+      inline: /runtime\..*\.js$/
+    }),
     new MiniCssExtractPlugin({
       filename: 'css/[name].[contenthash:8].css',
       chunkFilename: 'css/[name].[contenthash:8].css'
-    })
+    }),
+    // copy custom static assets
+    new CopyWebpackPlugin([
+      {
+        from: path.resolve(__dirname, '../public'),
+        to: path.resolve(__dirname, '../dist'),
+        ignore: ['.*']
+      }
+    ])
   ],
   optimization: {
     splitChunks: {
@@ -72,6 +103,7 @@ module.exports = merge(baseConfig, {
         }
       }
     },
+    runtimeChunk: 'single',
     minimizer: [
       new TerserWebpackPlugin({
         parallel: true,

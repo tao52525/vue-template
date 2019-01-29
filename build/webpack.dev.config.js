@@ -5,6 +5,7 @@ const webpack = require('webpack')
 const portfinder = require('portfinder')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
+const webpack = require('webpack')
 
 const devWebpackConfig = merge(baseConfig, {
   mode: 'development',
@@ -24,6 +25,14 @@ const devWebpackConfig = merge(baseConfig, {
     }
   },
   plugins: [
+    /* config.plugin('define') */
+    new webpack.DefinePlugin(
+      {
+        'process.env': {
+          NODE_ENV: '"development"'
+        }
+      }
+    ),
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: path.resolve(__dirname, '../public/index.html'),
