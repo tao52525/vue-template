@@ -13,7 +13,7 @@
     <h1>This is an about page312312</h1>
     <h1>{{ msg }}</h1>
     <h1>{{ msg }}</h1>
-    <h1 class="h1">{{ msg }}</h1>
+    <h1 class="h1">{{ msg }}<span>123</span></h1>
   </div>
 </template>
 
@@ -31,6 +31,10 @@ export default {
 .h1 {
   color: #777;
   font-size: 20px;
+  display: flex;
+  span {
+    flex: 1;
+  }
 }
 </style>
 

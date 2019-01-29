@@ -1,10 +1,11 @@
 const merge = require('webpack-merge')
-const CleanWebpackPlugin = require('clean-webpack-plugin')
 const path = require('path')
 const baseConfig = require('./webpack.base.config')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const TerserWebpackPlugin = require('terser-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const PreloadWebpackPlugin = require('preload-webpack-plugin')
 
 module.exports = merge(baseConfig, {
   mode: 'production',
@@ -18,11 +19,36 @@ module.exports = merge(baseConfig, {
     rules: []
   },
   plugins: [
-    new CleanWebpackPlugin(['dist/'], {
-      root: path.resolve(__dirname, '../'),
-      verbose: true,
-      dry: false
+    new HtmlWebpackPlugin({
+      filename: path.resolve(__dirname, '../dist/index.html'),
+      template: path.resolve(__dirname, '../public/index.html'),
+      favicon: path.resolve(__dirname, '../public/favicon.ico'),
+      inject: true
     }),
+    /* config.plugin('preload-index') */
+    new PreloadWebpackPlugin(
+      {
+        rel: 'preload',
+        includeHtmlNames: [
+          'index.html'
+        ],
+        include: 'initial',
+        fileBlacklist: [
+          /\.map$/,
+          /hot-update\.js$/
+        ]
+      }
+    ),
+    /* config.plugin('prefetch-index') */
+    new PreloadWebpackPlugin(
+      {
+        rel: 'prefetch',
+        includeHtmlNames: [
+          'index.html'
+        ],
+        include: 'asyncChunks'
+      }
+    ),
     new MiniCssExtractPlugin({
       filename: 'css/[name].[contenthash:8].css',
       chunkFilename: 'css/[name].[contenthash:8].css'

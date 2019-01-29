@@ -1,9 +1,7 @@
 const path = require('path')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const webpack = require('webpack')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const PreloadWebpackPlugin = require('preload-webpack-plugin')
 
 module.exports = {
   entry: {
@@ -88,40 +86,6 @@ module.exports = {
   },
   plugins: [
     new VueLoaderPlugin (),
-    new HtmlWebpackPlugin({
-      filename: 'index.html',
-      template: path.resolve(__dirname, '../public/index.html'),
-      favicon: path.resolve(__dirname, '../public/favicon.ico'),
-      chunks: [
-        'chunk-vendors',
-        'chunk-commons',
-        'index'
-      ]
-    }),
-    /* config.plugin('preload-index') */
-    new PreloadWebpackPlugin(
-      {
-        rel: 'preload',
-        includeHtmlNames: [
-          'index.html'
-        ],
-        include: 'initial',
-        fileBlacklist: [
-          /\.map$/,
-          /hot-update\.js$/
-        ]
-      }
-    ),
-    /* config.plugin('prefetch-index') */
-    new PreloadWebpackPlugin(
-      {
-        rel: 'prefetch',
-        includeHtmlNames: [
-          'index.html'
-        ],
-        include: 'asyncChunks'
-      }
-    ),
     new webpack.optimize.SplitChunksPlugin()
   ]
 }
