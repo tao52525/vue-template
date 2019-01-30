@@ -2,20 +2,18 @@ const path = require('path')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const webpack = require('webpack')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const config = require('./config')
 
 module.exports = {
   entry: {
     index: path.resolve(__dirname, '../src/index.js')
   },
   output: {
-    path: path.resolve(__dirname, '../dist'),
+    path: path.resolve(__dirname, config.outputDir),
     filename: '[name].js'
   },
   resolve: {
-    alias: {
-      'vue$': 'vue/dist/vue.esm.js',
-      '@': path.resolve(__dirname, '../src')
-    },
+    alias: config.alias,
     extensions: ['*', '.js', '.json', '.vue']
   },
   module: {
@@ -76,7 +74,6 @@ module.exports = {
     ]
   },
   plugins: [
-    new VueLoaderPlugin (),
-    new webpack.optimize.SplitChunksPlugin()
+    new VueLoaderPlugin ()
   ]
 }

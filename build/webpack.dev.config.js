@@ -6,6 +6,7 @@ const portfinder = require('portfinder')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const webpack = require('webpack')
+const config = require('./config')
 
 const devWebpackConfig = merge(baseConfig, {
   mode: 'development',
@@ -16,7 +17,7 @@ const devWebpackConfig = merge(baseConfig, {
     hot: true,
     compress: true,
     host: 'localhost',
-    port: 8090,
+    port: config.port,
     open: true,
     overlay: { warnings: false, errors: true },
     quiet: true, // necessary for FriendlyErrorsPlugin
@@ -44,7 +45,7 @@ const devWebpackConfig = merge(baseConfig, {
 })
 // module.exports = devWebpackConfig
 module.exports = new Promise((resolve, reject) => {
-  portfinder.basePort = 8090
+  portfinder.basePort = config.port
   portfinder.getPort((err, port) => {
     if (err) {
       reject(err)
