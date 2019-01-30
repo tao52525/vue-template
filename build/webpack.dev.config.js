@@ -5,7 +5,6 @@ const webpack = require('webpack')
 const portfinder = require('portfinder')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
-const webpack = require('webpack')
 const config = require('./config')
 
 const devWebpackConfig = merge(baseConfig, {

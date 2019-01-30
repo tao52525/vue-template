@@ -1,8 +1,11 @@
 const path = require('path')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
-const webpack = require('webpack')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const config = require('./config')
+
+function resolve(dir) {
+  return path.join(__dirname, '..', dir)
+}
 
 module.exports = {
   entry: {
@@ -17,8 +20,7 @@ module.exports = {
     extensions: ['*', '.js', '.json', '.vue']
   },
   module: {
-    rules: [
-      {
+    rules: [{
         test: /\.js/,
         use: 'babel-loader',
         exclude: /node_modules/
@@ -55,9 +57,9 @@ module.exports = {
       {
         test: /\.css$/,
         use: [
-          process.env.NODE_ENV !== 'production'
-            ? 'vue-style-loader'
-            : MiniCssExtractPlugin.loader,
+          process.env.NODE_ENV !== 'production' ?
+          'vue-style-loader' :
+          MiniCssExtractPlugin.loader,
           'css-loader',
           'postcss-loader'
         ]
@@ -65,15 +67,24 @@ module.exports = {
       {
         test: /\.less$/,
         use: [
-          process.env.NODE_ENV !== 'production'
-            ? 'vue-style-loader'
-            : MiniCssExtractPlugin.loader,
+          process.env.NODE_ENV !== 'production' ?
+          'vue-style-loader' :
+          MiniCssExtractPlugin.loader,
           'css-loader', 'less-loader', 'postcss-loader'
         ]
+      },
+      /* config.module.rule('eslint') */
+      {
+        test: /\.(js|vue)$/,
+        loader: 'eslint-loader',
+        enforce: 'pre',
+        include: [resolve('src'), resolve('test')],
+        options: {
+          formatter: require('eslint-friendly-formatter'),
+          emitWarning: true
+        }
       }
     ]
   },
-  plugins: [
-    new VueLoaderPlugin ()
-  ]
+  plugins: [new VueLoaderPlugin()]
 }
