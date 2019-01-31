@@ -13,7 +13,10 @@
     <h1>This is an about page312312</h1>
     <h1>{{ msg }}</h1>
     <h1>{{ msg }}</h1>
-    <h1 class="h1">{{ msg }}<span>123</span></h1>
+    <h1 class="h1">
+      {{ msg }}
+      <span>123</span>
+    </h1>
   </div>
 </template>
 
@@ -37,5 +40,3 @@ export default {
   }
 }
 </style>
-
-
